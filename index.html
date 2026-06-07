@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>同窓会 参加者一覧</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===== キーコード画面 ===== */
+    #login-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      width: 100%;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      text-align: center;
+    }
+
+    .login-card h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #1a2e4a;
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 28px;
+    }
+
+    .login-card input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #d0d8e4;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 16px;
+    }
+
+    .login-card input[type="password"]:focus {
+      border-color: #3b82f6;
+    }
+
+    .login-card button {
+      width: 100%;
+      padding: 13px;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-card button:hover { background: #2563eb; }
+    .login-card button:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    #login-error {
+      color: #dc2626;
+      font-size: 0.85rem;
+      margin-top: 12px;
+      min-height: 20px;
+    }
+
+    /* ===== リスト画面 ===== */
+    #list-screen {
+      display: none;
+      width: 100%;
+      max-width: 720px;
+      padding: 24px 16px;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .page-header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a2e4a;
+    }
+
+    .page-header p {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    /* 検索・フィルターバー */
+    .controls {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .controls input[type="text"],
+    .controls select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #d0d8e4;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .controls input[type="text"]:focus,
+    .controls select:focus {
+      border-color: #3b82f6;
+    }
+
+    .result-count {
+      font-size: 0.85rem;
+      color: #666;
+      text-align: right;
+      padding: 0 4px;
+    }
+
+    /* 参加者リスト */
+    #attendee-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+    }
+
+    .attendee-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .attendee-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    }
+
+    .attendee-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1a2e4a;
+    }
+
+    .attendee-year {
+      font-size: 0.78rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    #empty-message {
+      text-align: center;
+      color: #aaa;
+      padding: 40px;
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    /* ローディング */
+    #loading {
+      text-align: center;
+      padding: 60px;
+      color: #888;
+      font-size: 0.95rem;
+    }
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #d0d8e4;
+      border-top-color: #3b82f6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 480px) {
+      #attendee-list { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- キーコード入力画面 -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>同窓会 参加者一覧</h1>
+    <p>閲覧にはキーコードが必要です</p>
+    <input type="password" id="keycode-input" placeholder="キーコードを入力" autocomplete="off">
+    <button id="login-btn" onclick="login()">確認する</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- 参加者リスト画面 -->
+<div id="list-screen">
+  <div class="page-header">
+    <h1>同窓会 参加者一覧</h1>
+    <p id="total-label"></p>
+  </div>
+
+  <div class="controls">
+    <select id="year-filter" onchange="applyFilter()">
+      <option value="">── 卒業年で絞り込み ──</option>
+    </select>
+    <input type="text" id="kana-search" placeholder="カナで検索（例：イケダ）" oninput="applyFilter()">
+  </div>
+
+  <div class="result-count" id="result-count"></div>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    データを読み込み中...
+  </div>
+
+  <div id="attendee-list"></div>
+  <div id="empty-message">該当する参加者が見つかりません</div>
+</div>
+
+<script>
+  // ★ デプロイ後にGASのウェブアプリURLに書き換えてください
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFRNbYmpuFviZOXt5YfVIoK4aqtDtt3zkUSE28GAQKEOXsWFvpJH4RG4XMZk4FOINrEw/exec';
+
+  let allAttendees = [];
+
+  // Enter キーでもログイン実行
+  document.getElementById('keycode-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+
+  async function login() {
+    const keycode = document.getElementById('keycode-input').value.trim();
+    if (!keycode) return;
+
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    btn.disabled = true;
+    btn.textContent = '確認中...';
+    errEl.textContent = '';
+
+    try {
+      const res = await fetch(GAS_URL, {
+        method: 'POST',
+        body: JSON.stringify({ keycode }),
+      });
+
+      const json = await res.json();
+
+      if (!json.ok) {
+        errEl.textContent = 'キーコードが正しくありません';
+        btn.disabled = false;
+        btn.textContent = '確認する';
+        return;
+      }
+
+      // 認証成功 → リスト表示へ
+      allAttendees = json.data;
+      showList();
+
+    } catch (err) {
+      errEl.textContent = '通信エラーが発生しました。時間をおいて再試行してください。';
+      btn.disabled = false;
+      btn.textContent = '確認する';
+    }
+  }
+
+  function showList() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('list-screen').style.display = 'block';
+    document.getElementById('loading').style.display = 'none';
+
+    document.getElementById('total-label').textContent =
+      `参加者 ${allAttendees.length} 名`;
+
+    // 卒業年の選択肢を生成（重複排除・ソート）
+    const years = [...new Set(allAttendees.map(a => a.year).filter(y => y))]
+      .sort((a, b) => a.localeCompare(b, 'ja'));
+
+    const sel = document.getElementById('year-filter');
+    years.forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      sel.appendChild(opt);
+    });
+
+    renderList(allAttendees);
+  }
+
+  function applyFilter() {
+    const year = document.getElementById('year-filter').value;
+    const kana = document.getElementById('kana-search').value.trim();
+
+    let filtered = allAttendees;
+
+    if (year) {
+      filtered = filtered.filter(a => a.year === year);
+    }
+
+    if (kana) {
+      // 半角・全角カタカナ両対応
+      const q = toFullKana(kana.toUpperCase());
+      filtered = filtered.filter(a =>
+        a.kana.includes(q) || a.kana.includes(kana)
+      );
+    }
+
+    renderList(filtered);
+  }
+
+  function renderList(list) {
+    const container = document.getElementById('attendee-list');
+    const empty = document.getElementById('empty-message');
+    const countEl = document.getElementById('result-count');
+
+    container.innerHTML = '';
+
+    if (list.length === 0) {
+      empty.style.display = 'block';
+      countEl.textContent = '';
+      return;
+    }
+
+    empty.style.display = 'none';
+    countEl.textContent = `${list.length} 名表示中`;
+
+    list.forEach(a => {
+      const card = document.createElement('div');
+      card.className = 'attendee-card';
+      card.innerHTML = `
+        <div class="attendee-name">${escapeHtml(a.name)}</div>
+        ${a.year ? `<div class="attendee-year">${escapeHtml(a.year)}</div>` : ''}
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // 半角カナ → 全角カナ変換
+  function toFullKana(str) {
+    return str.replace(/[･-ﾟ]/g, c =>
+      String.fromCharCode(c.charCodeAt(0) + 0x60)
+    );
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+
+</body>
+</html>
