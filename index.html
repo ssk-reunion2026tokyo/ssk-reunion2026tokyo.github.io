@@ -3,261 +3,411 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>同窓会 参加者一覧</title>
+  <title>済々黌東京同窓会2026 参加者一覧</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
-      background: #f0f4f8;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    :root {
+      --gold:    #b8892a;
+      --gold-lt: #e8c96a;
+      --navy:    #1c2b4a;
+      --cream:   #faf6ee;
+      --warm:    #f5ede0;
+      --border:  #e0d5c5;
+      --text:    #2d2416;
+      --muted:   #8a7a65;
     }
 
-    /* ===== キーコード画面 ===== */
+    body {
+      font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* ===== ログイン画面 ===== */
     #login-screen {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      width: 100%;
       padding: 24px;
+      background:
+        linear-gradient(160deg, #1c2b4a 0%, #2d4070 50%, #1c2b4a 100%);
+    }
+
+    .login-emblem {
+      font-family: 'Noto Serif JP', serif;
+      color: var(--gold-lt);
+      font-size: 0.8rem;
+      letter-spacing: 0.3em;
+      margin-bottom: 8px;
+      opacity: 0.8;
+    }
+
+    .login-title {
+      font-family: 'Noto Serif JP', serif;
+      color: #fff;
+      font-size: 1.5rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .login-sub {
+      color: var(--gold-lt);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      margin-bottom: 40px;
+      opacity: 0.9;
     }
 
     .login-card {
-      background: #fff;
+      background: rgba(255,255,255,0.97);
       border-radius: 16px;
-      padding: 40px 32px;
+      padding: 36px 32px;
       width: 100%;
       max-width: 360px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
       text-align: center;
     }
 
-    .login-card h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #1a2e4a;
-      margin-bottom: 8px;
-    }
-
-    .login-card p {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 28px;
+    .login-card-title {
+      font-size: 0.85rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
     }
 
     .login-card input[type="password"] {
       width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #d0d8e4;
+      padding: 13px 16px;
+      border: 2px solid var(--border);
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.1rem;
+      font-family: inherit;
       outline: none;
       transition: border-color 0.2s;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      background: var(--cream);
+      color: var(--text);
+      text-align: center;
+      letter-spacing: 0.2em;
     }
 
     .login-card input[type="password"]:focus {
-      border-color: #3b82f6;
+      border-color: var(--gold);
+      background: #fff;
     }
 
     .login-card button {
       width: 100%;
-      padding: 13px;
-      background: #3b82f6;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--navy), #2d4070);
       color: #fff;
       border: none;
       border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: inherit;
+      letter-spacing: 0.15em;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: opacity 0.2s, transform 0.1s;
     }
 
-    .login-card button:hover { background: #2563eb; }
-    .login-card button:disabled { background: #93c5fd; cursor: not-allowed; }
+    .login-card button:hover  { opacity: 0.88; }
+    .login-card button:active { transform: scale(0.98); }
+    .login-card button:disabled { opacity: 0.5; cursor: not-allowed; }
 
     #login-error {
-      color: #dc2626;
-      font-size: 0.85rem;
+      color: #c0392b;
+      font-size: 0.82rem;
       margin-top: 12px;
-      min-height: 20px;
+      min-height: 18px;
     }
 
     /* ===== リスト画面 ===== */
-    #list-screen {
-      display: none;
-      width: 100%;
-      max-width: 720px;
-      padding: 24px 16px;
-    }
+    #list-screen { display: none; }
 
-    .page-header {
+    /* ヘッダー */
+    .site-header {
+      background: linear-gradient(135deg, var(--navy) 0%, #2d4070 100%);
+      color: #fff;
+      padding: 20px 24px 18px;
       text-align: center;
-      margin-bottom: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     }
 
-    .page-header h1 {
-      font-size: 1.5rem;
+    .site-header .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: var(--gold-lt);
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+
+    .site-header h1 {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 1.15rem;
       font-weight: 700;
-      color: #1a2e4a;
+      letter-spacing: 0.08em;
     }
 
-    .page-header p {
-      font-size: 0.85rem;
-      color: #888;
-      margin-top: 4px;
+    .site-header .count-badge {
+      display: inline-block;
+      margin-top: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 2px 14px;
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.05em;
     }
 
-    /* 検索・フィルターバー */
+    /* コントロールバー */
+    .controls-wrap {
+      background: var(--warm);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      position: sticky;
+      top: 82px;
+      z-index: 9;
+    }
+
     .controls {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      max-width: 700px;
+      margin: 0 auto;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
 
-    .controls input[type="text"],
-    .controls select {
-      width: 100%;
-      padding: 10px 14px;
-      border: 2px solid #d0d8e4;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
+    .input-wrap {
+      position: relative;
     }
 
-    .controls input[type="text"]:focus,
-    .controls select:focus {
-      border-color: #3b82f6;
+    .input-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    .controls select,
+    .controls input[type="text"] {
+      width: 100%;
+      padding: 10px 14px 10px 36px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    .controls select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a7a65' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .controls select:focus,
+    .controls input[type="text"]:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(184,137,42,0.15);
+    }
+
+    /* 件数表示 */
+    .result-bar {
+      max-width: 700px;
+      margin: 12px auto 0;
+      padding: 0 4px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
     }
 
     .result-count {
-      font-size: 0.85rem;
-      color: #666;
-      text-align: right;
-      padding: 0 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
     }
 
-    /* 参加者リスト */
+    /* 参加者グリッド */
+    .list-wrap {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+
     #attendee-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 10px;
     }
 
     .attendee-card {
       background: #fff;
+      border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 14px 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      transition: transform 0.15s, box-shadow 0.15s;
+      padding: 14px 14px 12px;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      cursor: default;
     }
 
     .attendee-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      box-shadow: 0 4px 16px rgba(28,43,74,0.10);
+      border-color: var(--gold);
     }
 
     .attendee-name {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #1a2e4a;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.4;
     }
 
     .attendee-year {
-      font-size: 0.78rem;
-      color: #888;
-      margin-top: 4px;
+      font-size: 0.73rem;
+      color: var(--muted);
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .attendee-year::before {
+      content: '';
+      display: inline-block;
+      width: 12px;
+      height: 1.5px;
+      background: var(--gold-lt);
+      border-radius: 1px;
     }
 
     #empty-message {
       text-align: center;
-      color: #aaa;
-      padding: 40px;
-      font-size: 0.95rem;
+      color: var(--muted);
+      padding: 60px 20px;
+      font-size: 0.9rem;
       display: none;
+      grid-column: 1 / -1;
     }
 
     /* ローディング */
     #loading {
       text-align: center;
-      padding: 60px;
-      color: #888;
-      font-size: 0.95rem;
+      padding: 80px 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
     }
 
     .spinner {
-      width: 32px;
-      height: 32px;
-      border: 3px solid #d0d8e4;
-      border-top-color: #3b82f6;
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 12px;
+      animation: spin 0.9s linear infinite;
+      margin: 0 auto 14px;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* フッター */
+    .site-footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      border-top: 1px solid var(--border);
+      letter-spacing: 0.05em;
+    }
+
     @media (max-width: 480px) {
       #attendee-list { grid-template-columns: repeat(2, 1fr); }
+      .login-title { font-size: 1.3rem; }
+      .site-header h1 { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
 
-<!-- キーコード入力画面 -->
+<!-- ===== ログイン画面 ===== -->
 <div id="login-screen">
+  <div class="login-emblem">済々黌東京同窓会</div>
+  <div class="login-title">参加者一覧</div>
+  <div class="login-sub">SAY! SAY! GO! GO! 2026</div>
+
   <div class="login-card">
-    <h1>同窓会 参加者一覧</h1>
-    <p>閲覧にはキーコードが必要です</p>
-    <input type="password" id="keycode-input" placeholder="キーコードを入力" autocomplete="off">
-    <button id="login-btn" onclick="login()">確認する</button>
+    <div class="login-card-title">キーコードを入力してください</div>
+    <input type="password" id="keycode-input" placeholder="● ● ● ● ● ● ●" autocomplete="off">
+    <button id="login-btn" onclick="login()">確 認 す る</button>
     <div id="login-error"></div>
   </div>
 </div>
 
-<!-- 参加者リスト画面 -->
+<!-- ===== リスト画面 ===== -->
 <div id="list-screen">
-  <div class="page-header">
-    <h1>同窓会 参加者一覧</h1>
-    <p id="total-label"></p>
+
+  <header class="site-header">
+    <div class="label">済々黌東京同窓会 2026</div>
+    <h1>参加者一覧</h1>
+    <span class="count-badge" id="total-label"></span>
+  </header>
+
+  <div class="controls-wrap">
+    <div class="controls">
+      <div class="input-wrap">
+        <span class="input-icon">🎓</span>
+        <select id="year-filter" onchange="applyFilter()">
+          <option value="">すべての卒業年</option>
+        </select>
+      </div>
+      <div class="input-wrap">
+        <span class="input-icon">🔍</span>
+        <input type="text" id="kana-search"
+          placeholder="名前で検索（カナ・ひらがな どちらでも）"
+          oninput="applyFilter()">
+      </div>
+    </div>
   </div>
 
-  <div class="controls">
-    <select id="year-filter" onchange="applyFilter()">
-      <option value="">── 卒業年で絞り込み ──</option>
-    </select>
-    <input type="text" id="kana-search" placeholder="カナで検索（例：イケダ）" oninput="applyFilter()">
+  <div class="result-bar">
+    <span class="result-count" id="result-count"></span>
   </div>
 
-  <div class="result-count" id="result-count"></div>
-
-  <div id="loading">
-    <div class="spinner"></div>
-    データを読み込み中...
+  <div class="list-wrap">
+    <div id="loading">
+      <div class="spinner"></div>
+      データを読み込み中...
+    </div>
+    <div id="attendee-list"></div>
+    <div id="empty-message">該当する参加者が見つかりません</div>
   </div>
 
-  <div id="attendee-list"></div>
-  <div id="empty-message">該当する参加者が見つかりません</div>
+  <footer class="site-footer">済々黌東京同窓会 2026 &nbsp;|&nbsp; 参加者専用ページ</footer>
 </div>
 
 <script>
-  // ★ デプロイ後にGASのウェブアプリURLに書き換えてください
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbwW_rNNWPcPwmXpNeZSWRvTpttQ4asZKK7-B0R2vJxQk__Ab-dUiMAuKF0C2ql_bNhDdA/exec';
 
   let allAttendees = [];
 
-  // Enter キーでもログイン実行
   document.getElementById('keycode-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') login();
   });
@@ -266,51 +416,43 @@
     const keycode = document.getElementById('keycode-input').value.trim();
     if (!keycode) return;
 
-    const btn = document.getElementById('login-btn');
-    const errEl = document.getElementById('login-error');
+    const btn    = document.getElementById('login-btn');
+    const errEl  = document.getElementById('login-error');
     btn.disabled = true;
     btn.textContent = '確認中...';
     errEl.textContent = '';
 
     try {
       const url = GAS_URL + '?keycode=' + encodeURIComponent(keycode);
-      const res = await fetch(url, {
-        method: 'GET',
-        redirect: 'follow',
-      });
-
+      const res  = await fetch(url, { method: 'GET', redirect: 'follow' });
       const json = await res.json();
 
       if (!json.ok) {
         errEl.textContent = 'キーコードが正しくありません';
         btn.disabled = false;
-        btn.textContent = '確認する';
+        btn.textContent = '確 認 す る';
         return;
       }
 
-      // 認証成功 → リスト表示へ
       allAttendees = json.data;
       showList();
 
     } catch (err) {
       errEl.textContent = '通信エラーが発生しました。時間をおいて再試行してください。';
       btn.disabled = false;
-      btn.textContent = '確認する';
+      btn.textContent = '確 認 す る';
     }
   }
 
   function showList() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('list-screen').style.display = 'block';
-    document.getElementById('loading').style.display = 'none';
+    document.getElementById('login-screen').style.display  = 'none';
+    document.getElementById('list-screen').style.display   = 'block';
+    document.getElementById('loading').style.display       = 'none';
+    document.getElementById('total-label').textContent     = `参加者 ${allAttendees.length} 名`;
 
-    document.getElementById('total-label').textContent =
-      `参加者 ${allAttendees.length} 名`;
-
-    // 卒業年の選択肢を生成（重複排除・ソート）
+    // 卒業年プルダウン生成
     const years = [...new Set(allAttendees.map(a => a.year).filter(y => y))]
       .sort((a, b) => a.localeCompare(b, 'ja'));
-
     const sel = document.getElementById('year-filter');
     years.forEach(y => {
       const opt = document.createElement('option');
@@ -324,7 +466,7 @@
 
   function applyFilter() {
     const year = document.getElementById('year-filter').value;
-    const kana = document.getElementById('kana-search').value.trim();
+    const raw  = document.getElementById('kana-search').value.trim();
 
     let filtered = allAttendees;
 
@@ -332,11 +474,13 @@
       filtered = filtered.filter(a => a.year === year);
     }
 
-    if (kana) {
-      // 半角・全角カタカナ両対応
-      const q = toFullKana(kana.toUpperCase());
+    if (raw) {
+      // ひらがな→カタカナ変換、半角→全角カナ変換 して検索
+      const q = toKatakana(toFullKana(raw.toUpperCase()));
       filtered = filtered.filter(a =>
-        a.kana.includes(q) || a.kana.includes(kana)
+        a.kana.includes(q) ||       // カタカナで検索
+        a.kana.includes(raw) ||     // 元の入力でも検索
+        a.name.includes(raw)        // 漢字でも検索
       );
     }
 
@@ -345,8 +489,8 @@
 
   function renderList(list) {
     const container = document.getElementById('attendee-list');
-    const empty = document.getElementById('empty-message');
-    const countEl = document.getElementById('result-count');
+    const empty     = document.getElementById('empty-message');
+    const countEl   = document.getElementById('result-count');
 
     container.innerHTML = '';
 
@@ -370,7 +514,14 @@
     });
   }
 
-  // 半角カナ → 全角カナ変換
+  // ひらがな → カタカナ
+  function toKatakana(str) {
+    return str.replace(/[ぁ-ゖ]/g, c =>
+      String.fromCharCode(c.charCodeAt(0) + 0x60)
+    );
+  }
+
+  // 半角カナ → 全角カナ
   function toFullKana(str) {
     return str.replace(/[･-ﾟ]/g, c =>
       String.fromCharCode(c.charCodeAt(0) + 0x60)
@@ -379,12 +530,9 @@
 
   function escapeHtml(str) {
     return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 </script>
-
 </body>
 </html>
