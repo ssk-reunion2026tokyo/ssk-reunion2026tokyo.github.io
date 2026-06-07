@@ -253,7 +253,7 @@
 
 <script>
   // ★ デプロイ後にGASのウェブアプリURLに書き換えてください
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbwFRNbYmpuFviZOXt5YfVIoK4aqtDtt3zkUSE28GAQKEOXsWFvpJH4RG4XMZk4FOINrEw/exec';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbx6euKFylB72-lXocuH6HyBXhMH9DbMMfiw_9hwwz3fOOfB_F33bq7jo0Q6u9hua5Dc4g/exec';
 
   let allAttendees = [];
 
@@ -273,9 +273,10 @@
     errEl.textContent = '';
 
     try {
-      const res = await fetch(GAS_URL, {
-        method: 'POST',
-        body: JSON.stringify({ keycode }),
+      const url = GAS_URL + '?keycode=' + encodeURIComponent(keycode);
+      const res = await fetch(url, {
+        method: 'GET',
+        redirect: 'follow',
       });
 
       const json = await res.json();
