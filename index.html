@@ -178,7 +178,7 @@
       border-bottom: 1px solid var(--border);
       padding: 14px 16px;
       position: sticky;
-      top: 82px;
+      top: 0;
       z-index: 9;
     }
 
@@ -406,6 +406,15 @@
 <script>
   const GAS_URL = 'https://script.google.com/macros/s/AKfycbzjLCt-0Y2Ul9Ezy3VxTytWetXZo7B3BS_ZwLKJYPOU7HQItFz0cZcEud9pQxFizranJA/exec';
 
+  // ヘッダーの高さに合わせてcontrols-wrapのtopを動的に設定
+  function adjustStickyTop() {
+    const header = document.querySelector('.site-header');
+    const controls = document.querySelector('.controls-wrap');
+    if (header && controls) {
+      controls.style.top = header.offsetHeight + 'px';
+    }
+  }
+
   let allAttendees = [];
 
   document.getElementById('keycode-input').addEventListener('keydown', e => {
@@ -449,6 +458,8 @@
     document.getElementById('list-screen').style.display   = 'block';
     document.getElementById('loading').style.display       = 'none';
     document.getElementById('total-label').textContent     = `参加者 ${allAttendees.length} 名`;
+    setTimeout(adjustStickyTop, 50); // 描画後に高さを計算
+    window.addEventListener('resize', adjustStickyTop);
 
     // 卒業年プルダウン生成
     const years = [...new Set(allAttendees.map(a => a.year).filter(y => y))]
