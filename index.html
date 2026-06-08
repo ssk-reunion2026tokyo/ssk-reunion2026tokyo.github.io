@@ -378,12 +378,6 @@
           <option value="">すべての卒業年</option>
         </select>
       </div>
-      <div class="input-wrap">
-        <span class="input-icon">🔍</span>
-        <input type="text" id="kana-search"
-          placeholder="名前で検索（カナ・ひらがな どちらでも）"
-          oninput="applyFilter()">
-      </div>
     </div>
   </div>
 
@@ -477,24 +471,10 @@
 
   function applyFilter() {
     const year = document.getElementById('year-filter').value;
-    const raw  = document.getElementById('kana-search').value.trim();
-
     let filtered = allAttendees;
-
     if (year) {
       filtered = filtered.filter(a => a.year === year);
     }
-
-    if (raw) {
-      // ひらがな→カタカナ変換、半角→全角カナ変換 して検索
-      const q = toKatakana(toFullKana(raw.toUpperCase()));
-      filtered = filtered.filter(a =>
-        a.kana.includes(q) ||       // カタカナで検索
-        a.kana.includes(raw) ||     // 元の入力でも検索
-        a.name.includes(raw)        // 漢字でも検索
-      );
-    }
-
     renderList(filtered);
   }
 
@@ -525,19 +505,6 @@
     });
   }
 
-  // ひらがな → カタカナ
-  function toKatakana(str) {
-    return str.replace(/[ぁ-ゖ]/g, c =>
-      String.fromCharCode(c.charCodeAt(0) + 0x60)
-    );
-  }
-
-  // 半角カナ → 全角カナ
-  function toFullKana(str) {
-    return str.replace(/[･-ﾟ]/g, c =>
-      String.fromCharCode(c.charCodeAt(0) + 0x60)
-    );
-  }
 
   function escapeHtml(str) {
     return str
